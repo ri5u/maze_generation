@@ -1,0 +1,28 @@
+*{
+    /* outline: 1px solid red; */
+    box-sizing: border-box;
+}
+body{
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container{
+    /* border: 2px solid black; */
+    padding: 5px;
+    background-color: black;
+    width: 80vh;
+    height: 80vh;
+    display: grid;
+    grid-template-columns: repeat(50, 1fr);
+    grid-template-rows: repeat(50, 1fr);
+    /* gap: 5px; */
+}
+
+.top-wall { border-top: 1px solid blue; }
+.bottom-wall { border-bottom: 1px solid blue; }
+.left-wall { border-left: 1px solid blue; }
+.right-wall { border-right: 1px solid blue; }
+
