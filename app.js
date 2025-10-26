@@ -1,65 +1,99 @@
 const container = document.querySelector(".container");
+const range = document.getElementById("sizeRange");
+const value = document.getElementById("sizeValue");
+const startBtn = document.getElementById("startBtn");
 
-const numRow = 50;
-const numCol = 50;
+range.addEventListener("input", () => value.textContent = range.value);
 
-for (let i = 0; i < numRow; i++) {
-    for (let j = 0; j < numCol; j++) {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.dataset.row = i;
-        cell.dataset.col = j;
-        cell.classList.add("top-wall", "bottom-wall", "left-wall", "right-wall"); // add all walls initially
-        container.appendChild(cell);
+startBtn.addEventListener("click", () => {
+    const size = parseInt(range.value);
+    container.innerHTML = "";
+    generateGrid(size);
+    generateMaze(0, 0, size, size);
+});
+
+function generateGrid(size) {
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell", "top-wall", "bottom-wall", "left-wall", "right-wall");
+            cell.dataset.row = i;
+            cell.dataset.col = j;
+            container.appendChild(cell);
+        }
     }
+    container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    container.style.gridTemplateRows = `repeat(${size}, 1fr)`;
 }
 
 let dir = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
-function generateMaze(startingRow, startingCol) {
-    const cell = document.querySelector(`[data-row="${startingRow}"][data-col="${startingCol}"]`);
-    if (cell.classList.contains("visited")) return;
+function generateMaze(row, col, numRow, numCol) {
+    const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    if (!cell || cell.classList.contains("visited")) return;
+
     cell.classList.add("visited");
     cell.style.backgroundColor = "pink";
+
     shuffle(dir);
-    for (let idx = 0; idx < 4; idx++) {
-        let newRow = startingRow + dir[idx][0];
-        let newCol = startingCol + dir[idx][1];
-        if (newRow < 0 || newCol < 0 || newRow >= numRow || newCol >= numCol) continue;
 
-        // remove walls between current cell and neighbor
-        const neighbor = document.querySelector(`[data-row="${newRow}"][data-col="${newCol}"]`);
-        if(!neighbor.classList.contains("visited")){
-            if (dir[idx][0] === -1) { // moving up
-                cell.classList.remove("top-wall");
-                neighbor.classList.remove("bottom-wall");
-            } else if (dir[idx][0] === 1) { // moving down
-                cell.classList.remove("bottom-wall");
-                neighbor.classList.remove("top-wall");
-            } else if (dir[idx][1] === -1) { // moving left
-                cell.classList.remove("left-wall");
-                neighbor.classList.remove("right-wall");
-            } else if (dir[idx][1] === 1) { // moving right
-                cell.classList.remove("right-wall");
-                neighbor.classList.remove("left-wall");
-            }
+    let idx = 0;
 
-            generateMaze(newRow, newCol);
-
+    function visitNext() {
+        if (idx >= 4) {
+            cell.style.backgroundColor = "gray"; // finished this cell
+            return;
         }
-    }
-    cell.style.backgroundColor = "gray";
 
+        const newRow = row + dir[idx][0];
+        const newCol = col + dir[idx][1];
+        idx++;
+
+        if (newRow < 0 || newCol < 0 || newRow >= numRow || newCol >= numCol) {
+            setTimeout(visitNext, 20); // schedule next direction
+            return;
+        }
+
+        const neighbor = document.querySelector(`[data-row="${newRow}"][data-col="${newCol}"]`);
+        if (!neighbor.classList.contains("visited")) {
+            removeWalls(cell, neighbor, dir[idx - 1]);
+            setTimeout(() => generateMaze(newRow, newCol, numRow, numCol), 20);
+        }
+
+        setTimeout(visitNext, 20); // schedule next direction
+    }
+
+    visitNext();
 }
 
-function shuffle(dirArray) {
-    let currentIndex = dirArray.length;
+
+
+function removeWalls(cell, neighbor, direction) {
+    if (direction[0] === -1) { // up
+        cell.classList.remove("top-wall");
+        neighbor.classList.remove("bottom-wall");
+    } else if (direction[0] === 1) { // down
+        cell.classList.remove("bottom-wall");
+        neighbor.classList.remove("top-wall");
+    } else if (direction[1] === -1) { // left
+        cell.classList.remove("left-wall");
+        neighbor.classList.remove("right-wall");
+    } else if (direction[1] === 1) { // right
+        cell.classList.remove("right-wall");
+        neighbor.classList.remove("left-wall");
+    }
+}
+
+function shuffle(array) {
+    let currentIndex = array.length;
     while (currentIndex) {
         let randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
-        [dirArray[currentIndex], dirArray[randomIndex]] = [dirArray[randomIndex], dirArray[currentIndex]];
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
     }
 }
 
-generateMaze(0, 0);
+// initialize default
+generateGrid(50);
+generateMaze(0, 0, 50, 50);
 

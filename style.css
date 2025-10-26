@@ -1,28 +1,66 @@
-*{
-    /* outline: 1px solid red; */
+* {
     box-sizing: border-box;
 }
-body{
+body {
     height: 100vh;
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: #0a0a0a;
 }
-.container{
-    /* border: 2px solid black; */
-    padding: 5px;
-    background-color: black;
-    width: 80vh;
-    height: 80vh;
+
+.container {
+    padding: 4px;
+    background-color: #111;
+    width: 80vmin;
+    height: 80vmin;
     display: grid;
     grid-template-columns: repeat(50, 1fr);
     grid-template-rows: repeat(50, 1fr);
-    /* gap: 5px; */
 }
 
-.top-wall { border-top: 1px solid blue; }
-.bottom-wall { border-bottom: 1px solid blue; }
-.left-wall { border-left: 1px solid blue; }
-.right-wall { border-right: 1px solid blue; }
+.cell {
+    transition: background-color 0.1s ease, border-color 0.2s ease;
+}
+.top-wall    { border-top: 2px solid #1e90ff; }
+.bottom-wall { border-bottom: 2px solid #1e90ff; }
+.left-wall   { border-left: 2px solid #1e90ff; }
+.right-wall  { border-right: 2px solid #1e90ff; }
+.visited {
+    background-color: #222;
+}
+.current {
+    background-color: #ff2e63;
+}
+.finished {
+    background-color: #555;
+}
+
+.controls {
+  position: absolute;
+  top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,0,0.6);
+  padding: 10px 15px;
+  border-radius: 8px;
+  color: white;
+  font-family: monospace;
+}
+input[type="range"] {
+  accent-color: dodgerblue;
+}
+button {
+  background-color: dodgerblue;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: royalblue;
+}
 
