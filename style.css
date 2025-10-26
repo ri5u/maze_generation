@@ -16,8 +16,6 @@ body {
     width: 80vmin;
     height: 80vmin;
     display: grid;
-    grid-template-columns: repeat(50, 1fr);
-    grid-template-rows: repeat(50, 1fr);
 }
 
 .cell {

@@ -5,11 +5,20 @@ const startBtn = document.getElementById("startBtn");
 
 range.addEventListener("input", () => value.textContent = range.value);
 
-startBtn.addEventListener("click", () => {
+// small sleep helper for animation pacing
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+// directions (keep as global reference, but we will shuffle a copy per cell)
+let dir = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+startBtn.addEventListener("click", async () => {
     const size = parseInt(range.value);
+    const startRow = Math.floor(Math.random() * size);
+    const startCol = Math.floor(Math.random() * size);
     container.innerHTML = "";
     generateGrid(size);
-    generateMaze(0, 0, size, size);
+    // await the async DFS so generation completes in order
+    await generateMaze(startRow, startCol, size, size);
 });
 
 function generateGrid(size) {
@@ -26,47 +35,51 @@ function generateGrid(size) {
     container.style.gridTemplateRows = `repeat(${size}, 1fr)`;
 }
 
-let dir = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+function shuffledCopy(array) {
+    const a = array.slice();
+    let currentIndex = a.length;
+    while (currentIndex) {
+        let randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [a[currentIndex], a[randomIndex]] = [a[randomIndex], a[currentIndex]];
+    }
+    return a;
+}
 
-function generateMaze(row, col, numRow, numCol) {
+async function generateMaze(row, col, numRow, numCol, preMarked = false) {
     const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-    if (!cell || cell.classList.contains("visited")) return;
+    if (!cell) return;
 
-    cell.classList.add("visited");
-    cell.style.backgroundColor = "pink";
+    if (cell.classList.contains("visited") && !preMarked) return;
 
-    shuffle(dir);
+    cell.classList.add("visited", "current");
 
-    let idx = 0;
+    const localDirs = shuffledCopy(dir);
 
-    function visitNext() {
-        if (idx >= 4) {
-            cell.style.backgroundColor = "gray"; // finished this cell
-            return;
-        }
-
-        const newRow = row + dir[idx][0];
-        const newCol = col + dir[idx][1];
-        idx++;
+    for (const direction of localDirs) {
+        const newRow = row + direction[0];
+        const newCol = col + direction[1];
 
         if (newRow < 0 || newCol < 0 || newRow >= numRow || newCol >= numCol) {
-            setTimeout(visitNext, 20); // schedule next direction
-            return;
+            continue;
         }
 
         const neighbor = document.querySelector(`[data-row="${newRow}"][data-col="${newCol}"]`);
-        if (!neighbor.classList.contains("visited")) {
-            removeWalls(cell, neighbor, dir[idx - 1]);
-            setTimeout(() => generateMaze(newRow, newCol, numRow, numCol), 50);
-        }
+        if (!neighbor) continue;
 
-        setTimeout(visitNext, 50); // schedule next direction
+        if (!neighbor.classList.contains("visited")) {
+            neighbor.classList.add("visited");
+
+            removeWalls(cell, neighbor, direction);
+
+            await sleep(50);
+            await generateMaze(newRow, newCol, numRow, numCol, true);
+        }
     }
 
-    visitNext();
+    cell.classList.remove("current");
+    cell.classList.add("finished");
 }
-
-
 
 function removeWalls(cell, neighbor, direction) {
     if (direction[0] === -1) { // up
@@ -83,25 +96,4 @@ function removeWalls(cell, neighbor, direction) {
         neighbor.classList.remove("left-wall");
     }
 }
-
-function shuffle(array) {
-    let currentIndex = array.length;
-    while (currentIndex) {
-        let randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-    }
-}
-
-// initialize default
-// generateGrid(50);
-// generateMaze(0, 0, 50, 50);
-
-startBtn.addEventListener("click", () => {
-    const size = parseInt(range.value);
-    container.innerHTML = "";
-    generateGrid(size);
-    generateMaze(0, 0, size, size); // await to animate properly
-});
-
 
