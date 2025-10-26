@@ -57,10 +57,10 @@ function generateMaze(row, col, numRow, numCol) {
         const neighbor = document.querySelector(`[data-row="${newRow}"][data-col="${newCol}"]`);
         if (!neighbor.classList.contains("visited")) {
             removeWalls(cell, neighbor, dir[idx - 1]);
-            setTimeout(() => generateMaze(newRow, newCol, numRow, numCol), 20);
+            setTimeout(() => generateMaze(newRow, newCol, numRow, numCol), 50);
         }
 
-        setTimeout(visitNext, 20); // schedule next direction
+        setTimeout(visitNext, 50); // schedule next direction
     }
 
     visitNext();
@@ -94,6 +94,14 @@ function shuffle(array) {
 }
 
 // initialize default
-generateGrid(50);
-generateMaze(0, 0, 50, 50);
+// generateGrid(50);
+// generateMaze(0, 0, 50, 50);
+
+startBtn.addEventListener("click", () => {
+    const size = parseInt(range.value);
+    container.innerHTML = "";
+    generateGrid(size);
+    generateMaze(0, 0, size, size); // await to animate properly
+});
+
 
