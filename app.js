@@ -5,10 +5,8 @@ const startBtn = document.getElementById("startBtn");
 
 range.addEventListener("input", () => value.textContent = range.value);
 
-// small sleep helper for animation pacing
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-// directions (keep as global reference, but we will shuffle a copy per cell)
 let dir = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
 startBtn.addEventListener("click", async () => {
@@ -17,7 +15,6 @@ startBtn.addEventListener("click", async () => {
     const startCol = Math.floor(Math.random() * size);
     container.innerHTML = "";
     generateGrid(size);
-    // await the async DFS so generation completes in order
     await generateMaze(startRow, startCol, size, size);
 });
 
@@ -69,14 +66,11 @@ async function generateMaze(row, col, numRow, numCol, preMarked = false) {
 
         if (!neighbor.classList.contains("visited")) {
             neighbor.classList.add("visited");
-
             removeWalls(cell, neighbor, direction);
-
             await sleep(50);
             await generateMaze(newRow, newCol, numRow, numCol, true);
         }
     }
-
     cell.classList.remove("current");
     cell.classList.add("finished");
 }

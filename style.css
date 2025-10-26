@@ -25,9 +25,11 @@ body {
 .bottom-wall { border-bottom: 2px solid #1e90ff; }
 .left-wall   { border-left: 2px solid #1e90ff; }
 .right-wall  { border-right: 2px solid #1e90ff; }
-.visited {
-    background-color: #222;
-}
+
+/* .visited { */
+/*     background-color: #222; */
+/* } */
+
 .current {
     background-color: #ff2e63;
 }
